@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MemeViewController: UIViewController , UIImagePickerControllerDelegate,
+class MemeEditorViewController: UIViewController , UIImagePickerControllerDelegate,
 UINavigationControllerDelegate , UITextFieldDelegate {
 
     // MARK: Outlets
@@ -18,6 +18,7 @@ UINavigationControllerDelegate , UITextFieldDelegate {
     @IBOutlet weak var shareButton: UIBarButtonItem!
     @IBOutlet weak var topTextField: UITextField!
     @IBOutlet weak var bottomTextField: UITextField!
+    
     
     //Set textField TextAttributes
     let memeTextAttributes: [NSAttributedString.Key: Any] = [
@@ -153,8 +154,13 @@ UINavigationControllerDelegate , UITextFieldDelegate {
     }
     
     func saveMeme()  {
-            // Create the meme
-            let meme = Meme(topText: topTextField.text!, bottomText: bottomTextField.text!, originalImage: imagePickerView.image!, memedImage: generateMemedImage())
+        // Create the meme
+        let meme = Meme(topText: topTextField.text!, bottomText: bottomTextField.text!, originalImage: imagePickerView.image!, memedImage: generateMemedImage())
+        
+        // Add it to the memes array in the Application Delegate
+        let object = UIApplication.shared.delegate
+        let appDelegate = object as! AppDelegate
+        appDelegate.memes.append(meme)
 
     }
     
@@ -176,6 +182,9 @@ UINavigationControllerDelegate , UITextFieldDelegate {
                 }
             
             self.saveMeme()
+            NotificationCenter.default.post(name: .didAddMeme , object: nil )
+            self.dismissView()
+            
         }
         self.present(activityVC, animated: true, completion: nil)
         
@@ -185,6 +194,13 @@ UINavigationControllerDelegate , UITextFieldDelegate {
         shareButton.isEnabled = !( self.imagePickerView.image == nil)
     }
     
+    @IBAction func cancelPressed (_ sender: Any) {
+        dismissView()
+    }
+    
+    func dismissView(){
+        dismiss(animated: true, completion: nil)
+    }
     
 }
 
